@@ -122,3 +122,9 @@
 - **Archivo/línea:** `tests/api.test.js`, líneas 283-293
 - **Qué reveló:** Cuando el payload es JSON malformado, Express devuelve `400` pero con `content-type: text/html` en vez de una respuesta JSON uniforme.
 - **Resultado observado:** esperado `application/json`, recibido `text/html; charset=utf-8`.
+
+## Estado tras refactorización
+
+- **Pruebas:** `npm test` ejecutado con resultado `20/20` pruebas exitosas.
+- **Cobertura de bugs corregidos:** las 6 pruebas que fallaban en la fase anterior ahora pasan.
+- **npm audit:** `0` vulnerabilidades (`info: 0`, `low: 0`, `moderate: 0`, `high: 0`, `critical: 0`).

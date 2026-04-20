@@ -15,6 +15,15 @@ function resetData() {
   asistencias.length = 0;
 }
 
+function serializarEstudiantePublico(estudiante) {
+  return {
+    id: estudiante.id,
+    nombre: estudiante.nombre,
+    codigo: estudiante.codigo,
+    creadoEn: estudiante.creadoEn
+  };
+}
+
 function generarId(lista) {
   return lista.length ? Math.max(...lista.map((item) => item.id)) + 1 : 1;
 }
@@ -95,7 +104,7 @@ app.post("/api/estudiantes", (req, res) => {
 
   const codigoExistente = estudiantes.find((estudiante) => estudiante.codigo === codigo);
   if (codigoExistente) {
-    return res.status(400).json({
+    return res.status(409).json({
       error: "El codigo del estudiante ya existe"
     });
   }
@@ -114,7 +123,7 @@ app.post("/api/estudiantes", (req, res) => {
 });
 
 app.get("/api/estudiantes", (req, res) => {
-  res.json(estudiantes);
+  res.json(estudiantes.map(serializarEstudiantePublico));
 });
 
 app.get("/api/estudiantes/:id", (req, res) => {
@@ -127,7 +136,7 @@ app.get("/api/estudiantes/:id", (req, res) => {
     });
   }
 
-  return res.json(estudiante);
+  return res.json(serializarEstudiantePublico(estudiante));
 });
 
 app.post("/api/asistencias", (req, res) => {
@@ -177,7 +186,7 @@ app.post("/api/asistencias", (req, res) => {
   );
 
   if (asistenciaExistente) {
-    return res.status(400).json({
+    return res.status(409).json({
       error: "Ya existe una asistencia registrada para este estudiante en esa fecha"
     });
   }
@@ -207,7 +216,7 @@ app.get("/api/asistencias/estudiante/:id", (req, res) => {
   const historial = asistencias.filter((item) => item.estudianteId === id);
 
   return res.json({
-    estudiante,
+    estudiante: serializarEstudiantePublico(estudiante),
     asistencias: historial
   });
 });
@@ -236,6 +245,18 @@ app.get("/api/reportes/ausentismo", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     error: "Ruta no encontrada"
+  });
+});
+
+app.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    return res.status(400).json({
+      error: "JSON invalido"
+    });
+  }
+
+  return res.status(500).json({
+    error: "Error interno del servidor"
   });
 });
 
