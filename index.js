@@ -68,6 +68,12 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/api/estado", (req, res) => {
+  res.json({
+    mensaje: "API de asistencia estudiantil funcionando"
+  });
+});
+
 app.get("/ui", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });

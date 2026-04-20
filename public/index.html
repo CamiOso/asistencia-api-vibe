@@ -263,8 +263,8 @@
           respuestas JSON en tiempo real sobre la misma API local.
         </p>
         <div class="hero-actions">
-          <a href="/" target="_blank" rel="noreferrer">Ver raíz JSON</a>
-          <button class="secondary" type="button" id="btn-health">Probar `GET /`</button>
+          <a href="/api/estado" target="_blank" rel="noreferrer">Ver estado API</a>
+          <button class="secondary" type="button" id="btn-health">Probar `GET /api/estado`</button>
           <button class="secondary" type="button" id="btn-clear">Limpiar consola</button>
         </div>
       </section>
@@ -410,7 +410,7 @@
       }
 
       document.getElementById("btn-health").addEventListener("click", () => {
-        request("/");
+        request("/api/estado");
       });
 
       document.getElementById("btn-clear").addEventListener("click", () => {

@@ -1,0 +1,19 @@
+[build]
+  command = "echo 'Netlify build ready'"
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+  external_node_modules = ["express"]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ui"
+  to = "/"
+  status = 301
