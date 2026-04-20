@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Pruebas API</title>
+    <style>
+      :root {
+        --bg: #f4efe7;
+        --panel: #fffaf2;
+        --panel-strong: #f3e2c7;
+        --text: #1b1b1b;
+        --muted: #6d6254;
+        --accent: #c25b2f;
+        --accent-dark: #8f3d1d;
+        --line: #d8c8af;
+        --ok: #1d7a52;
+        --error: #b33a3a;
+        --shadow: 0 20px 40px rgba(75, 49, 32, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(194, 91, 47, 0.18), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(143, 61, 29, 0.15), transparent 30%),
+          linear-gradient(135deg, #f8f3ea 0%, #f1e5d1 100%);
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 32px));
+        margin: 32px auto 48px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 28px;
+        border: 1px solid rgba(194, 91, 47, 0.2);
+        border-radius: 28px;
+        background: rgba(255, 250, 242, 0.88);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--accent-dark);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.8rem);
+        line-height: 0.95;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 60ch;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .hero-actions a,
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        background: var(--accent);
+        color: #fffaf2;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 150ms ease, background 150ms ease;
+      }
+
+      .hero-actions a.secondary,
+      button.secondary {
+        background: #ead8bb;
+        color: var(--accent-dark);
+      }
+
+      .hero-actions a:hover,
+      button:hover {
+        transform: translateY(-1px);
+        background: var(--accent-dark);
+      }
+
+      .hero-actions a.secondary:hover,
+      button.secondary:hover {
+        background: #d7c097;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        padding: 22px;
+        border-radius: 24px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .card h2 {
+        margin: 0 0 8px;
+        font-size: 1.35rem;
+      }
+
+      .card p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        min-height: 42px;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .row > * {
+        flex: 1 1 150px;
+      }
+
+      .console {
+        margin-top: 22px;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .console-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel-strong);
+      }
+
+      .console-header h2 {
+        margin: 0;
+      }
+
+      .status {
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        background: #efe3d0;
+        color: var(--accent-dark);
+      }
+
+      .status.ok {
+        background: rgba(29, 122, 82, 0.12);
+        color: var(--ok);
+      }
+
+      .status.error {
+        background: rgba(179, 58, 58, 0.12);
+        color: var(--error);
+      }
+
+      pre {
+        margin: 0;
+        padding: 18px;
+        overflow: auto;
+        background: #241a14;
+        color: #f6ead8;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+
+      .hint {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          width: min(100% - 20px, 1180px);
+          margin-top: 16px;
+        }
+
+        .hero,
+        .card {
+          border-radius: 20px;
+          padding: 18px;
+        }
+
+        .console-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Asistencia estudiantil</p>
+        <h1>Panel visual para probar la API</h1>
+        <p>
+          Usa estos formularios para crear estudiantes, registrar asistencias y consultar
+          respuestas JSON en tiempo real sobre la misma API local.
+        </p>
+        <div class="hero-actions">
+          <a href="/" target="_blank" rel="noreferrer">Ver raíz JSON</a>
+          <button class="secondary" type="button" id="btn-health">Probar `GET /`</button>
+          <button class="secondary" type="button" id="btn-clear">Limpiar consola</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Crear estudiante</h2>
+          <p>`POST /api/estudiantes`</p>
+          <form id="form-estudiante">
+            <label>
+              Nombre
+              <input name="nombre" placeholder="Maria Lopez" required />
+            </label>
+            <label>
+              Código
+              <input name="codigo" placeholder="EST00124" required />
+            </label>
+            <label>
+              Correo
+              <input name="correo" placeholder="maria@correo.com" />
+            </label>
+            <button type="submit">Crear estudiante</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Listar estudiantes</h2>
+          <p>`GET /api/estudiantes` y `GET /api/estudiantes/:id`</p>
+          <div class="stack">
+            <button type="button" id="btn-estudiantes">Ver todos</button>
+            <div class="row">
+              <input id="estudiante-id" type="number" min="1" placeholder="ID estudiante" />
+              <button type="button" class="secondary" id="btn-estudiante-id">Buscar por ID</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Registrar asistencia</h2>
+          <p>`POST /api/asistencias`</p>
+          <form id="form-asistencia">
+            <label>
+              ID del estudiante
+              <input name="estudianteId" type="number" min="1" placeholder="1" required />
+            </label>
+            <label>
+              Fecha
+              <input name="fecha" type="date" required />
+            </label>
+            <label>
+              Estado
+              <select name="estado" required>
+                <option value="presente">presente</option>
+                <option value="ausente">ausente</option>
+                <option value="justificada">justificada</option>
+              </select>
+            </label>
+            <button type="submit">Registrar asistencia</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Historial por estudiante</h2>
+          <p>`GET /api/asistencias/estudiante/:id`</p>
+          <div class="row">
+            <input id="asistencia-estudiante-id" type="number" min="1" placeholder="ID estudiante" />
+            <button type="button" id="btn-asistencias-estudiante">Consultar historial</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Reporte de ausentismo</h2>
+          <p>`GET /api/reportes/ausentismo`</p>
+          <button type="button" id="btn-ausentismo">Ver top 5</button>
+          <p class="hint">Cuenta las asistencias con estado `ausente` y ordena de mayor a menor.</p>
+        </article>
+
+        <article class="card">
+          <h2>Prueba manual</h2>
+          <p>Envía un JSON libre a cualquier endpoint de la API.</p>
+          <form id="form-manual">
+            <label>
+              Método
+              <select name="method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+              </select>
+            </label>
+            <label>
+              Ruta
+              <input name="path" placeholder="/api/estudiantes" required />
+            </label>
+            <label>
+              Body JSON
+              <textarea name="body" placeholder='{"nombre":"Ana","codigo":"EST00125"}'></textarea>
+            </label>
+            <button type="submit">Enviar request</button>
+          </form>
+        </article>
+      </section>
+
+      <section class="card console">
+        <div class="console-header">
+          <h2>Respuesta del servidor</h2>
+          <span class="status" id="status-pill">Sin ejecutar</span>
+        </div>
+        <pre id="output">Aquí verás el status, el endpoint llamado y el JSON de respuesta.</pre>
+      </section>
+    </main>
+
+    <script>
+      const output = document.getElementById("output");
+      const statusPill = document.getElementById("status-pill");
+
+      function setOutput(title, status, data, ok) {
+        statusPill.textContent = status;
+        statusPill.className = ok ? "status ok" : "status error";
+        output.textContent = `${title}\n\n${JSON.stringify(data, null, 2)}`;
+      }
+
+      async function request(path, options = {}) {
+        const method = options.method || "GET";
+        let body = options.body;
+
+        const config = {
+          method,
+          headers: {}
+        };
+
+        if (body !== undefined) {
+          config.headers["Content-Type"] = "application/json";
+          config.body = JSON.stringify(body);
+        }
+
+        try {
+          const response = await fetch(path, config);
+          const text = await response.text();
+          const data = text ? JSON.parse(text) : {};
+          setOutput(`${method} ${path}`, `HTTP ${response.status}`, data, response.ok);
+        } catch (error) {
+          setOutput(`${method} ${path}`, "Error de red", { error: error.message }, false);
+        }
+      }
+
+      document.getElementById("btn-health").addEventListener("click", () => {
+        request("/");
+      });
+
+      document.getElementById("btn-clear").addEventListener("click", () => {
+        statusPill.textContent = "Sin ejecutar";
+        statusPill.className = "status";
+        output.textContent = "Aquí verás el status, el endpoint llamado y el JSON de respuesta.";
+      });
+
+      document.getElementById("form-estudiante").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        request("/api/estudiantes", {
+          method: "POST",
+          body: {
+            nombre: form.get("nombre"),
+            codigo: form.get("codigo"),
+            correo: form.get("correo")
+          }
+        });
+      });
+
+      document.getElementById("btn-estudiantes").addEventListener("click", () => {
+        request("/api/estudiantes");
+      });
+
+      document.getElementById("btn-estudiante-id").addEventListener("click", () => {
+        const id = document.getElementById("estudiante-id").value;
+        if (!id) {
+          setOutput("GET /api/estudiantes/:id", "Validación", { error: "Ingresa un ID" }, false);
+          return;
+        }
+        request(`/api/estudiantes/${id}`);
+      });
+
+      document.getElementById("form-asistencia").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        request("/api/asistencias", {
+          method: "POST",
+          body: {
+            estudianteId: Number(form.get("estudianteId")),
+            fecha: form.get("fecha"),
+            estado: form.get("estado")
+          }
+        });
+      });
+
+      document.getElementById("btn-asistencias-estudiante").addEventListener("click", () => {
+        const id = document.getElementById("asistencia-estudiante-id").value;
+        if (!id) {
+          setOutput(
+            "GET /api/asistencias/estudiante/:id",
+            "Validación",
+            { error: "Ingresa un ID" },
+            false
+          );
+          return;
+        }
+        request(`/api/asistencias/estudiante/${id}`);
+      });
+
+      document.getElementById("btn-ausentismo").addEventListener("click", () => {
+        request("/api/reportes/ausentismo");
+      });
+
+      document.getElementById("form-manual").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        const method = form.get("method");
+        const path = form.get("path");
+        const rawBody = form.get("body").trim();
+
+        if (!path) {
+          setOutput("Request manual", "Validación", { error: "Ingresa una ruta" }, false);
+          return;
+        }
+
+        if (method === "GET" || !rawBody) {
+          request(path, { method });
+          return;
+        }
+
+        try {
+          request(path, { method, body: JSON.parse(rawBody) });
+        } catch (error) {
+          setOutput("Request manual", "JSON inválido", { error: error.message }, false);
+        }
+      });
+
+      document.querySelector('input[name="fecha"]').value = new Date().toISOString().slice(0, 10);
+    </script>
+  </body>
+</html>

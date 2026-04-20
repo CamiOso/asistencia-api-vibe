@@ -1,12 +1,19 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use("/ui", express.static(path.join(__dirname, "public")));
 
 const estudiantes = [];
 const asistencias = [];
+
+function resetData() {
+  estudiantes.length = 0;
+  asistencias.length = 0;
+}
 
 function generarId(lista) {
   return lista.length ? Math.max(...lista.map((item) => item.id)) + 1 : 1;
@@ -59,6 +66,10 @@ app.get("/", (req, res) => {
   res.json({
     mensaje: "API de asistencia estudiantil funcionando"
   });
+});
+
+app.get("/ui", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.post("/api/estudiantes", (req, res) => {
@@ -222,6 +233,13 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = {
+  app,
+  resetData
+};

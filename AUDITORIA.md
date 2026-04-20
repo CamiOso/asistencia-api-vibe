@@ -81,3 +81,44 @@
 - **Descripción:** El código generado sí valida el patrón `EST\\d{5}`, rechaza fechas futuras, restringe el estado a los tres valores esperados y evita duplicados de asistencia por estudiante y fecha.
 - **Evidencia:** Existen funciones dedicadas para formato de código, estado y fecha, y además se validan antes de persistir datos.
 - **Impacto:** La base funcional cumple varias reglas de negocio del enunciado, aunque todavía tiene vacíos operativos y de seguridad.
+
+## Bugs confirmados por pruebas
+
+- **Comando ejecutado:** `./.tools/node/bin/node ./node_modules/jest/bin/jest.js --verbose`
+- **Resultado general:** 20 pruebas ejecutadas, 14 exitosas y 6 fallidas.
+
+### Falla 1 — Duplicado de estudiante responde `400` en vez de `409`
+- **Prueba:** `rechaza estudiante duplicado con codigo 409`
+- **Archivo/línea:** `tests/api.test.js`, líneas 39-45
+- **Qué reveló:** La API detecta el duplicado, pero usa un código HTTP incorrecto para un conflicto de unicidad.
+- **Resultado observado:** esperado `409`, recibido `400`.
+
+### Falla 2 — El listado público expone `correo`
+- **Prueba:** `no deberia exponer el correo en el listado publico`
+- **Archivo/línea:** `tests/api.test.js`, líneas 77-84
+- **Qué reveló:** `GET /api/estudiantes` devuelve datos personales sin minimización.
+- **Resultado observado:** el objeto de respuesta contiene la propiedad `correo`.
+
+### Falla 3 — La consulta por ID expone `correo`
+- **Prueba:** `no deberia exponer el correo al consultar por id`
+- **Archivo/línea:** `tests/api.test.js`, líneas 95-102
+- **Qué reveló:** `GET /api/estudiantes/:id` también devuelve datos personales completos.
+- **Resultado observado:** el objeto de respuesta contiene la propiedad `correo`.
+
+### Falla 4 — Duplicado de asistencia responde `400` en vez de `409`
+- **Prueba:** `rechaza asistencia duplicada con codigo 409`
+- **Archivo/línea:** `tests/api.test.js`, líneas 154-170
+- **Qué reveló:** La regla de no duplicar asistencia está presente, pero la API responde con un código HTTP semánticamente incorrecto.
+- **Resultado observado:** esperado `409`, recibido `400`.
+
+### Falla 5 — El historial por estudiante expone `correo`
+- **Prueba:** `no deberia exponer el correo dentro del historial`
+- **Archivo/línea:** `tests/api.test.js`, líneas 205-212
+- **Qué reveló:** `GET /api/asistencias/estudiante/:id` reexpone el objeto de estudiante con datos personales.
+- **Resultado observado:** `res.body.estudiante` contiene la propiedad `correo`.
+
+### Falla 6 — JSON inválido no devuelve error consistente en JSON
+- **Prueba:** `responde con error JSON consistente cuando el body es invalido`
+- **Archivo/línea:** `tests/api.test.js`, líneas 283-293
+- **Qué reveló:** Cuando el payload es JSON malformado, Express devuelve `400` pero con `content-type: text/html` en vez de una respuesta JSON uniforme.
+- **Resultado observado:** esperado `application/json`, recibido `text/html; charset=utf-8`.
